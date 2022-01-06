@@ -1,0 +1,45 @@
+name: "Setup MSVC"
+description: "Setup Microsoft Visual C++ compiler"
+
+inputs:
+  architecture:
+    description: "Hardware architecture"
+    required: true
+    default: "x64"
+  version:
+    description: "Toolset version"
+    required: true
+    default: "14.16"
+
+runs:
+  using: "composite"
+  steps:
+    -
+      name: Set MSVC toolchain (v9)
+      shell: pwsh
+      run: |
+        if (-not "$env:VS090URL") {
+            Write-Warning "Missing environment variable VS090URL, using fallback"
+            $env:VS090URL = "https://github.com/reider-roque/sulley-win-installer/raw/master/VCForPython27.msi"
+        }
+        Invoke-WebRequest "$env:VS090URL" -OutFile VCForPython27.msi
+        (Start-Process "msiexec" -NoNewWindow -PassThru -ArgumentList         `
+            "/i VCForPython27.msi /qn /l*! output.log").WaitForExit()
+        Remove-Item -Path VCForPython27.msi
+        $MSVCVARS = "VCINSTALLDIR", "WindowsSdkDir", "PATH", "LIB", "LIBPATH", "INCLUDE"
+        $MSVCROOT = "$env:LOCALAPPDATA\Programs\Common\Microsoft\Visual C++ for Python\9.0"
+        cmd.exe /c "`"${MSVCROOT}\vcvarsall.bat`" ${{ inputs.architecture }} && set" |
+        ForEach-Object {
+            $name, $value = $_ -split '=', 2
+            if (${MSVCVARS} -contains $name) {
+                echo $_ >> $env:GITHUB_ENV
+            }
+        }
+      if: ${{ inputs.version == '9' || inputs.version == '9.0' }}
+    -
+      name: Set MSVC toolchain (v14+)
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: ${{ inputs.architecture }}
+        toolset: ${{ inputs.version }}
+      if: ${{ inputs.version != '9' && inputs.version != '9.0' }}
