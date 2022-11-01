@@ -26,7 +26,7 @@ runs:
         (Start-Process "msiexec" -NoNewWindow -PassThru -ArgumentList         `
             "/i VCForPython27.msi /qn /l*! output.log").WaitForExit()
         Remove-Item -Path VCForPython27.msi
-        $MSVCVARS = "VCINSTALLDIR", "WindowsSdkDir", "PATH", "LIB", "LIBPATH", "INCLUDE"
+        $MSVCVARS = "INCLUDE", "LIB", "LIBPATH", "PATH", "VCINSTALLDIR", "WindowsSdkDir"
         $MSVCROOT = "$env:LOCALAPPDATA\Programs\Common\Microsoft\Visual C++ for Python\9.0"
         cmd.exe /c "`"${MSVCROOT}\vcvarsall.bat`" ${{ inputs.architecture }} && set" |
         ForEach-Object {
@@ -40,7 +40,14 @@ runs:
       name: Set MSVC toolchain (v14.0)
       shell: pwsh
       run: |
-        $MSVCVARS = "VCINSTALLDIR", "WindowsSdkDir", "PATH", "LIB", "LIBPATH", "INCLUDE", "VS140COMNTOOLS"
+        $MSVCVARS = "INCLUDE", "LIB", "LIBPATH", "PATH", "VCINSTALLDIR",      `
+                    "VSINSTALLDIR", "VS140COMNTOOLS", "VisualStudioVersion",  `
+                    "CommandPromptType", "Platform",                          `
+                    "FrameworkDir", "FrameworkVersion", "Framework40Version", `
+                    "FrameworkDIR32", "FrameworkVersion32",                   `
+                    "FrameworkDIR64", "FrameworkVersion64",                   `
+                    "WindowsLibPath", "UCRTVersion", "UniversalCRTSdkDir",    `
+                    "WindowsSdkDir", "WindowsSDKLibVersion", "WindowsSDKVersion"
         $MSVCROOT = "C:\Program Files (x86)\Microsoft Visual Studio 14.0"
         cmd.exe /c "`"${MSVCROOT}\VC\vcvarsall.bat`" ${{ inputs.architecture }} && set" |
         ForEach-Object {
