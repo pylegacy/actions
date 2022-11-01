@@ -2,11 +2,11 @@ name: "Setup MSVC"
 description: "Setup Microsoft Visual C++ compiler"
 
 inputs:
-  architecture:
+  arch:
     description: "Hardware architecture"
     required: true
     default: "x64"
-  version:
+  toolset:
     description: "Toolset version"
     required: true
     default: "14.16"
@@ -19,20 +19,20 @@ runs:
       shell: pwsh
       run: |
         & "${{ github.action_path }}\scripts\install_msvc90.ps1"
-        & "${{ github.action_path }}\scripts\start_msvc.ps1" ${{ inputs.architecture }} v90 |
+        & "${{ github.action_path }}\scripts\start_msvc.ps1" ${{ inputs.arch }} v90 |
             ForEach-Object { Write-Output $_ >> $env:GITHUB_ENV }
-      if: ${{ contains(fromJson('["9", "9.0"]'), inputs.version) }}
+      if: ${{ contains(fromJson('["9", "9.0"]'), inputs.toolset) }}
     -
       name: Set MSVC toolchain (v14.0)
       shell: pwsh
       run: |
-        & "${{ github.action_path }}\scripts\start_msvc.ps1" ${{ inputs.architecture }} v140 |
+        & "${{ github.action_path }}\scripts\start_msvc.ps1" ${{ inputs.arch }} v140 |
             ForEach-Object { Write-Output $_ >> $env:GITHUB_ENV }
-      if: ${{ contains(fromJson('["14", "14.0"]'), inputs.version) }}
+      if: ${{ contains(fromJson('["14", "14.0"]'), inputs.toolset) }}
     -
       name: Set MSVC toolchain (v14.1+)
       uses: ilammy/msvc-dev-cmd@v1
       with:
         arch: ${{ inputs.architecture }}
-        toolset: ${{ inputs.version }}
-      if: ${{ ! contains(fromJson('["9", "9.0", "14", "14.0"]'), inputs.version) }}
+        toolset: ${{ inputs.toolset }}
+      if: ${{ ! contains(fromJson('["9", "9.0", "14", "14.0"]'), inputs.toolset) }}
