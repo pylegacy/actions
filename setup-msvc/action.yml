@@ -35,7 +35,7 @@ runs:
                 echo $_ >> $env:GITHUB_ENV
             }
         }
-      if: ${{ inputs.version == '9' || inputs.version == '9.0' }}
+      if: ${{ contains(fromJson('["9", "9.0"]'), inputs.version) }}
     -
       name: Set MSVC toolchain (v14.0)
       shell: pwsh
@@ -49,11 +49,11 @@ runs:
                 echo $_ >> $env:GITHUB_ENV
             }
         }
-      if: ${{ inputs.version == '14' || inputs.version == '14.0' }}
+      if: ${{ contains(fromJson('["14", "14.0"]'), inputs.version) }}
     -
       name: Set MSVC toolchain (v14.1+)
       uses: ilammy/msvc-dev-cmd@v1
       with:
         arch: ${{ inputs.architecture }}
         toolset: ${{ inputs.version }}
-      if: ${{ inputs.version != '9' && inputs.version != '9.0' && inputs.version != '14' && inputs.version != '14.0' }}
+      if: ${{ ! contains(fromJson('["9", "9.0", "14", "14.0"]'), inputs.version) }}
