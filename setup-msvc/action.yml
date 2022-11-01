@@ -18,7 +18,7 @@ runs:
       name: Set MSVC toolchain (v9.0)
       shell: pwsh
       run: |
-        & "${{ github.action_path }}\scripts\install_msvc90.ps1"
+        & "${{ github.action_path }}\scripts\setup_msvc90.ps1"
         & "${{ github.action_path }}\scripts\start_msvc.ps1" ${{ inputs.arch }} v90 |
             ForEach-Object { Write-Output $_ >> $env:GITHUB_ENV }
       if: ${{ contains(fromJson('["9", "9.0"]'), inputs.toolset) }}
