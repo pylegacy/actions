@@ -1,0 +1,53 @@
+name: "Setup Python with pyenv-win"
+description: "Setup Python on Windows through pyenv-win"
+
+inputs:
+  architecture:
+    description: "Hardware architecture"
+    required: true
+    default: "x64"
+  python-version:
+    description: "Python version"
+    required: true
+    default: "latest"
+  pyenv-folder:
+    description: "pyenv-win installation folder"
+    required: true
+    default: "C:\\ProgramData\\pyenv-win"
+  pyenv-version:
+    description: "pyenv-win branch or tag"
+    required: true
+    default: "master"
+
+runs:
+  using: "composite"
+  steps:
+    -
+      name: Set pyenv-win
+      shell: pwsh
+      run: |
+        Set-Variable -Name "PYENV" -Value "${{ inputs.pyenv-folder }}\pyenv-win"
+        git clone --depth 1 -b ${{ inputs.pyenv-version }} `
+            https://github.com/pyenv-win/pyenv-win.git ${{ inputs.pyenv-folder }}
+        echo PYENV="${PYENV}\" >> $env:GITHUB_ENV
+        echo PYENV_HOME="${PYENV}\" >> $env:GITHUB_ENV
+        echo PYENV_ROOT="${PYENV}\" >> $env:GITHUB_ENV
+        echo PATH="${PYENV}\bin;${PYENV}\shims;$env:PATH" >> $env:GITHUB_ENV
+    -
+      name: Set Python
+      shell: pwsh
+      run: |
+        Switch ("${{ inputs.architecture }}") {
+            "arm64"  { Set-Variable -Name "pyarch" -Value "-arm" }
+            "x86"    { Set-Variable -Name "pyarch" -Value "-win32" }
+            "x64"    { Set-Variable -Name "pyarch" -Value "" }
+            default  { Set-Variable -Name "pyarch" -Value "" }
+        }
+        Switch ("${{ inputs.python-version }}") {
+            "latest" { Set-Variable -Name "pyvers" -Value "[0-9]+\.[0-9]+" }
+            default  { Set-Variable -Name "pyvers" -Value "${{ inputs.python-version }}" }
+        }
+        $pyregex = "^${pyvers}(\.[0-9]+(rc[0-9]+)?)?${pyarch}$"
+        $version = $(pyenv install --list | Where {$_ -Match "${pyregex}"} | Select -Last 1)
+        pyenv install "${version}"
+        pyenv global "${version}"
