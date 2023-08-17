@@ -1,0 +1,35 @@
+name: "Setup Python with pyenv-win"
+description: "Setup Python on Windows through pyenv-win"
+
+inputs:
+  arch:
+    description: "Hardware architecture"
+    required: true
+    default: "x64"
+  python-version:
+    description: "Python version"
+    required: true
+    default: "latest"
+  pyenv-root:
+    description: "pyenv-win installation root directory"
+    required: true
+    default: "C:\\ProgramData\\pyenv-win"
+  pyenv-version:
+    description: "pyenv-win branch or tag"
+    required: true
+    default: "master"
+
+runs:
+  using: "composite"
+  steps:
+    -
+      name: Set pyenv-win
+      shell: pwsh
+      run: |
+        & git clone --depth 1 -b ${{ inputs.pyenv-version }}
+            https://github.com/pyenv-win/pyenv-win.git ${{ inputs.pyenv-root }}
+        & $env:PYENV = "${{ inputs.pyenv-root }}\\pyenv-win\\"
+        & echo PYENV="$env:PYENV" >> $env:GITHUB_ENV
+        & echo PYENV_HOME="$env:PYENV" >> $env:GITHUB_ENV
+        & echo PYENV_ROOT="$env:PYENV" >> $env:GITHUB_ENV
+        & echo PATH="$env:PYENV\\bin;$env:PYENV\\shims;$env:PATH" >> $env:GITHUB_ENV
