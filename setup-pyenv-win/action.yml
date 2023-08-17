@@ -10,8 +10,8 @@ inputs:
     description: "Python version"
     required: true
     default: "latest"
-  pyenv-root:
-    description: "pyenv-win installation root directory"
+  pyenv-folder:
+    description: "pyenv-win installation folder"
     required: true
     default: "C:\\ProgramData\\pyenv-win"
   pyenv-version:
@@ -26,10 +26,10 @@ runs:
       name: Set pyenv-win
       shell: pwsh
       run: |
-        & git clone --depth 1 -b ${{ inputs.pyenv-version }}
-            https://github.com/pyenv-win/pyenv-win.git ${{ inputs.pyenv-root }}
-        & $env:PYENV = "${{ inputs.pyenv-root }}\\pyenv-win\\"
-        & echo PYENV="$env:PYENV" >> $env:GITHUB_ENV
-        & echo PYENV_HOME="$env:PYENV" >> $env:GITHUB_ENV
-        & echo PYENV_ROOT="$env:PYENV" >> $env:GITHUB_ENV
-        & echo PATH="$env:PYENV\\bin;$env:PYENV\\shims;$env:PATH" >> $env:GITHUB_ENV
+        Set-Variable -Name "PYENV" -Value "${{ inputs.pyenv-folder }}\pyenv-win"
+        git clone --depth 1 -b ${{ inputs.pyenv-version }} `
+            https://github.com/pyenv-win/pyenv-win.git ${{ inputs.pyenv-folder }}
+        echo PYENV="${PYENV}\" >> $env:GITHUB_ENV
+        echo PYENV_HOME="${PYENV}\" >> $env:GITHUB_ENV
+        echo PYENV_ROOT="${PYENV}\" >> $env:GITHUB_ENV
+        echo PATH="${PYENV}\bin;${PYENV}\shims;$env:PATH" >> $env:GITHUB_ENV

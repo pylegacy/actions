@@ -1,0 +1,39 @@
+name: setup-pyenv-win
+
+on:
+  push:
+    paths:
+      - ".github/workflows/setup-pyenv-win.yml"
+      - "setup-pyenv-win/**"
+  pull_request:
+    paths:
+      - ".github/workflows/setup-pyenv-win.yml"
+      - "setup-pyenv-win/**"
+  workflow_dispatch:
+
+jobs:
+
+  test:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        arch:
+          ["x64", "x86"]
+        python-version:
+          ["2.7"]
+      max-parallel: 2
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Set pyenv-win
+        uses: ./setup-pyenv-win
+        with:
+          arch: ${{ matrix.arch }}
+          python-version: ${{ matrix.python-version }}
+      -
+        name: Test pyenv-win basic call
+        run: |
+          pyenv --version
+          pyenv help
