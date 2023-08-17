@@ -27,13 +27,18 @@ jobs:
         name: Checkout
         uses: actions/checkout@v3
       -
-        name: Set pyenv-win
+        name: Set Python
         uses: ./setup-pyenv-win
         with:
           arch: ${{ matrix.arch }}
           python-version: ${{ matrix.python-version }}
       -
-        name: Test pyenv-win basic call
+        name: Test pyenv-win installation
         run: |
           pyenv --version
           pyenv help
+      -
+        name: Test Python installation
+        run: |
+          pyenv versions
+          python -V
