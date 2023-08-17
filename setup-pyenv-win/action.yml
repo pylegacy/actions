@@ -2,7 +2,7 @@ name: "Setup Python with pyenv-win"
 description: "Setup Python on Windows through pyenv-win"
 
 inputs:
-  arch:
+  architecture:
     description: "Hardware architecture"
     required: true
     default: "x64"
@@ -37,7 +37,7 @@ runs:
       name: Set Python
       shell: pwsh
       run: |
-        Switch ("${{ inputs.arch }}") {
+        Switch ("${{ inputs.architecture }}") {
             "arm64"  { Set-Variable -Name "pyarch" -Value "-arm" }
             "x86"    { Set-Variable -Name "pyarch" -Value "-win32" }
             "x64"    { Set-Variable -Name "pyarch" -Value "" }
